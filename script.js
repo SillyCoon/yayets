@@ -44,6 +44,10 @@ let startTime = null;
 let routeCoordinates = [];
 let userTrack = [];
 let userHeading = 0;
+// Heading smoothing buffer
+const headingBuffer = [];
+const HEADING_BUFFER_SIZE = 5;
+const HEADING_UPDATE_THRESHOLD = 5; // degrees
 
 // Create a custom marker icon with direction indicator
 const markerIcon = L.divIcon({
@@ -266,25 +270,28 @@ function handleOrientation(event) {
     }
 
     if (heading !== undefined && !isNaN(heading)) {
-        const previousHeading = userHeading;
-        userHeading = heading;
-        updateMarkerDirection(heading);
-        
-        // Update heading display
-        document.getElementById('headingDisplay').textContent = `${Math.round(heading)}°`;
-        
-        // Rotate map if auto-rotate is enabled
-        if (document.getElementById('autoRotate').checked) {
-            map.setBearing(heading);
+        // Add heading to buffer
+        headingBuffer.push(heading);
+        if (headingBuffer.length > HEADING_BUFFER_SIZE) {
+            headingBuffer.shift();
         }
-        
-        // Emit a custom event for significant direction changes (more than 10 degrees)
-        if (Math.abs(heading - previousHeading) > 10) {
-            const event = new CustomEvent('directionChanged', { 
-                detail: { 
-                    heading: heading,
-                    change: heading - previousHeading 
-                } 
+        // Calculate smoothed heading
+        const smoothedHeading = headingBuffer.reduce((a, b) => a + b, 0) / headingBuffer.length;
+        const previousHeading = userHeading;
+        // Only update if change is significant
+        if (Math.abs(smoothedHeading - previousHeading) > HEADING_UPDATE_THRESHOLD) {
+            userHeading = smoothedHeading;
+            updateMarkerDirection(smoothedHeading);
+            document.getElementById('headingDisplay').textContent = `${Math.round(smoothedHeading)}°`;
+            if (document.getElementById('autoRotate').checked) {
+                map.setBearing(smoothedHeading);
+            }
+            // Emit a custom event for significant direction changes
+            const event = new CustomEvent('directionChanged', {
+                detail: {
+                    heading: smoothedHeading,
+                    change: smoothedHeading - previousHeading
+                }
             });
             window.dispatchEvent(event);
         }

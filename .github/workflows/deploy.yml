@@ -1,0 +1,47 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main # or master, depending on your default branch name
+  workflow_dispatch: # Allows manual triggering
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v3
+
+      - name: Check if secret exists
+        run: |
+          if [ -z "${{ secrets.ORS_API_KEY }}" ]; then
+            echo "::error::ORS_API_KEY secret is not set. Please add it in the repository settings."
+            exit 1
+          else
+            echo "ORS_API_KEY secret is properly set"
+          fi
+
+      - name: Create config.js
+        run: |
+          echo "const CONFIG = { ORS_API_KEY: '${{ secrets.ORS_API_KEY }}' };" > config.js
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v2
+        with:
+          path: '.'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2

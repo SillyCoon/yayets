@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Running Route Generator</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div id="controls">
+            <div class="input-group">
+                <label for="distance">Target Distance (km):</label>
+                <input type="number" id="distance" min="1" max="30" value="5" step="0.5">
+            </div>
+            <button id="getLocation">Get My Location</button>
+            <button id="generateRoute">Generate Route</button>
+            <div class="input-group">
+                <label>
+                    <input type="checkbox" id="autoRotate"> Auto-rotate map
+                </label>
+                <div id="compass">Current heading: <span id="headingDisplay">0°</span></div>
+            </div>
+            <button id="startTracking" disabled>Start Running</button>
+            <button id="stopTracking" disabled>Stop Running</button>
+            <div id="stats">
+                <p>Distance: <span id="currentDistance">0.00</span> km</p>
+                <p>Time: <span id="currentTime">00:00:00</span></p>
+            </div>
+        </div>
+        <div id="map"></div>
+    </div>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="config.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

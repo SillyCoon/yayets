@@ -1,0 +1,7 @@
+# Ignore configuration file with sensitive data
+config.js
+
+# Ignore common files
+.DS_Store
+node_modules/
+*.log

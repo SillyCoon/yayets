@@ -1,67 +1,113 @@
+/* Base styles - Mobile first */
+:root {
+    --primary-color: #4CAF50;
+    --primary-hover: #45a049;
+    --disabled-color: #cccccc;
+    --background-light: #f5f5f5;
+    --text-dark: #333;
+    --control-height: 40vh;
+    --spacing: 10px;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
 body {
     margin: 0;
     padding: 0;
     font-family: Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
 }
 
 .container {
     display: flex;
+    flex-direction: column;
     height: 100vh;
+    width: 100%;
 }
 
 #controls {
-    width: 300px;
-    padding: 20px;
-    background-color: #f5f5f5;
+    order: 2;
+    width: 100%;
+    height: var(--control-height);
+    padding: var(--spacing);
+    background-color: var(--background-light);
+    overflow-y: auto;
+    transition: height 0.3s ease;
 }
 
 #map {
-    flex: 1;
-    height: 100%;
+    order: 1;
+    width: 100%;
+    height: calc(100vh - var(--control-height));
+    transition: height 0.3s ease;
 }
 
 .input-group {
-    margin-bottom: 15px;
+    margin-bottom: var(--spacing);
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+input[type="number"] {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
 }
 
 button {
     width: 100%;
-    padding: 10px;
+    padding: 12px;
     margin: 5px 0;
-    background-color: #4CAF50;
+    background-color: var(--primary-color);
     color: white;
     border: none;
     border-radius: 4px;
     cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.2s ease;
 }
 
 button:disabled {
-    background-color: #cccccc;
+    background-color: var(--disabled-color);
     cursor: not-allowed;
 }
 
 button:hover:not(:disabled) {
-    background-color: #45a049;
+    background-color: var(--primary-hover);
 }
 
 #stats {
-    margin-top: 20px;
-    padding: 10px;
+    margin-top: var(--spacing);
+    padding: var(--spacing);
     background-color: white;
     border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 #stats p {
     margin: 5px 0;
+    font-size: 0.9rem;
 }
 
 #compass {
-    margin-top: 10px;
-    padding: 5px;
+    margin-top: var(--spacing);
+    padding: var(--spacing);
     border-radius: 4px;
     transition: background-color 0.2s;
     text-align: center;
     font-weight: bold;
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .reset-rotation {
@@ -69,13 +115,84 @@ button:hover:not(:disabled) {
     line-height: 26px;
     text-align: center;
     text-decoration: none;
-    color: #333;
+    color: var(--text-dark);
     width: 26px;
     height: 26px;
     display: block;
     background-color: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .reset-rotation:hover {
-    background-color: #f4f4f4;
+    background-color: var(--background-light);
+}
+
+/* Collapsible controls toggle */
+#controlsToggle {
+    position: fixed;
+    bottom: calc(var(--control-height) - 1px);
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--background-light);
+    border: none;
+    border-radius: 4px 4px 0 0;
+    padding: 5px 20px;
+    cursor: pointer;
+    z-index: 1000;
+    height: 20px;
+    width: 60px;
+}
+
+#controlsToggle::before {
+    content: '';
+    display: block;
+    width: 20px;
+    height: 2px;
+    background-color: var(--text-dark);
+    margin: 0 auto;
+}
+
+/* Tablet styles */
+@media (min-width: 768px) {
+    .container {
+        flex-direction: row;
+    }
+
+    #controls {
+        order: 1;
+        width: 320px;
+        height: 100vh;
+    }
+
+    #map {
+        order: 2;
+        width: calc(100% - 320px);
+        height: 100vh;
+    }
+
+    #controlsToggle {
+        display: none;
+    }
+}
+
+/* Desktop styles */
+@media (min-width: 1024px) {
+    #controls {
+        width: 400px;
+    }
+
+    #map {
+        width: calc(100% - 400px);
+    }
+
+    button {
+        padding: 15px;
+    }
+}
+
+/* Landscape orientation on mobile */
+@media (max-width: 767px) and (orientation: landscape) {
+    :root {
+        --control-height: 60vh;
+    }
 }

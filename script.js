@@ -304,8 +304,29 @@ window.addEventListener('directionChanged', (e) => {
     }, 200);
 });
 
+// Controls toggle functionality
+const controlsToggle = document.getElementById('controlsToggle');
+const controls = document.getElementById('controls');
+let controlsCollapsed = false;
+
+function toggleControls() {
+    controlsCollapsed = !controlsCollapsed;
+    if (controlsCollapsed) {
+        controls.style.height = '40px';
+        controlsToggle.style.bottom = '39px';
+        controlsToggle.style.transform = 'translateX(-50%) rotate(180deg)';
+    } else {
+        controls.style.height = 'var(--control-height)';
+        controlsToggle.style.bottom = 'calc(var(--control-height) - 1px)';
+        controlsToggle.style.transform = 'translateX(-50%)';
+    }
+    // Trigger a resize event for the map
+    map.invalidateSize();
+}
+
 // Event listeners
 document.getElementById('getLocation').addEventListener('click', getUserLocation);
 document.getElementById('generateRoute').addEventListener('click', generateRoute);
 document.getElementById('startTracking').addEventListener('click', startTracking);
 document.getElementById('stopTracking').addEventListener('click', stopTracking);
+controlsToggle.addEventListener('click', toggleControls);

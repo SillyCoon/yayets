@@ -1,4 +1,5 @@
 // @ts-check
+import { CONFIG } from "./config.js";
 
 // Initialize map with rotation support
 const map = L.map("map", {
@@ -138,8 +139,6 @@ async function generateRoute() {
 		]);
 		routeLayer = L.polyline(routeCoordinates, { color: "blue" }).addTo(map);
 		map.fitBounds(routeLayer.getBounds());
-
-		document.getElementById("startTracking").disabled = false;
 	} catch (error) {
 		console.error("Error generating route:", error);
 		alert("Error generating route. Please try again.");
@@ -173,9 +172,8 @@ function calculateDestination(start, distance) {
 
 // Start tracking function
 function startTracking() {
-	document.getElementById("startTracking").disabled = true;
-	document.getElementById("stopTracking").disabled = false;
-	document.getElementById("generateRoute").disabled = true;
+	const genBtn = document.getElementById("generateRoute");
+	if (genBtn) genBtn.disabled = true;
 	userTrack = [];
 	startTime = new Date();
 
@@ -216,8 +214,6 @@ function stopTracking() {
 	if (trackingInterval) {
 		navigator.geolocation.clearWatch(trackingInterval);
 	}
-	document.getElementById("startTracking").disabled = false;
-	document.getElementById("stopTracking").disabled = true;
 	document.getElementById("generateRoute").disabled = false;
 
 	// Draw the completed track
@@ -345,7 +341,7 @@ function toggleControls() {
 		controlsToggle.style.transform = "translateX(-50%) rotate(180deg)";
 	} else {
 		controls.style.height = "var(--control-height)";
-		controlsToggle.style.bottom = "calc(var(--control-height) - 1px)";
+		controlsToggle.style.bottom = "calc(var(--control-height) - 12vh)";
 		controlsToggle.style.transform = "translateX(-50%)";
 	}
 	// Trigger a resize event for the map
@@ -354,13 +350,57 @@ function toggleControls() {
 
 // Event listeners
 document
-	.getElementById("getLocation")
+	.getElementById("floatingLocation")
 	.addEventListener("click", getUserLocation);
 document
 	.getElementById("generateRoute")
 	.addEventListener("click", generateRoute);
-document
-	.getElementById("startTracking")
-	.addEventListener("click", startTracking);
-document.getElementById("stopTracking").addEventListener("click", stopTracking);
 controlsToggle.addEventListener("click", toggleControls);
+
+const runToggle = document.getElementById("runToggle");
+const runToggleIcon = document.getElementById("runToggleIcon");
+let isRunning = false;
+
+function updateRunToggleState(enabled, running) {
+	if (runToggle) runToggle.disabled = !enabled;
+	if (runToggleIcon) runToggleIcon.textContent = running ? "⏹️" : "▶️";
+	if (runToggle)
+		runToggle.setAttribute(
+			"aria-label",
+			running ? "Stop Running" : "Start Running",
+		);
+}
+
+function handleRunToggle() {
+	console.log("Run toggle clicked. Current state:", isRunning);
+	if (!isRunning) {
+		startTracking();
+		isRunning = true;
+		updateRunToggleState(true, true);
+	} else {
+		stopTracking();
+		isRunning = false;
+		updateRunToggleState(true, false);
+	}
+}
+
+// Replace old start/stop button logic
+if (runToggle) {
+	runToggle.addEventListener("click", handleRunToggle);
+}
+
+// Enable runToggle only after route is generated
+const origGenerateRoute = generateRoute;
+generateRoute = async function () {
+	await origGenerateRoute.apply(this, arguments);
+	updateRunToggleState(true, false);
+	isRunning = false;
+};
+
+// Ensure runToggle button is always wired to call handleRunToggle
+document.addEventListener("DOMContentLoaded", () => {
+	const runToggle = document.getElementById("runToggle");
+	if (runToggle) {
+		runToggle.addEventListener("click", handleRunToggle);
+	}
+});

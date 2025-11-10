@@ -28,6 +28,9 @@ body {
     flex-direction: column;
     height: 100vh;
     width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
 }
 
 #controls {
@@ -38,6 +41,8 @@ body {
     background-color: var(--background-light);
     overflow-y: auto;
     transition: height 0.3s ease;
+    position: relative;
+    z-index: 1;
 }
 
 #map {
@@ -45,6 +50,14 @@ body {
     width: 100%;
     height: calc(100vh - var(--control-height));
     transition: height 0.3s ease;
+    position: relative;
+    z-index: 0;
+}
+
+/* Ensure Leaflet map container takes full height */
+.leaflet-container {
+    width: 100% !important;
+    height: 100% !important;
 }
 
 .input-group {

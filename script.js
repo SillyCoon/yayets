@@ -1,11 +1,21 @@
 // Initialize map with rotation support
 const map = L.map('map', {
     rotate: true,
-    rotateControl: true
+    rotateControl: true,
+    tap: true // Enable tap handler for touch devices
 }).setView([0, 0], 13);
+
+// Add map tiles layer
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap contributors'
+    attribution: '© OpenStreetMap contributors',
+    maxZoom: 19,
+    minZoom: 3
 }).addTo(map);
+
+// Force map to update its size
+setTimeout(() => {
+    map.invalidateSize();
+}, 100);
 
 // Add rotation reset control
 L.control.button = L.Control.extend({
